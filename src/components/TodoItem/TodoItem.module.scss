@@ -11,3 +11,16 @@
     padding-left: 7px;
   }
 }
+
+.checkbox {
+  cursor: pointer;
+}
+
+input:checked + p{
+  text-decoration: line-through;
+}
+
+.delete {
+  color: red;
+  cursor: pointer;
+}

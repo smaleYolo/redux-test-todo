@@ -14,3 +14,13 @@
 .todo_list {
   padding: 10px;
 }
+
+.header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.menu button {
+  padding: 5px;
+  margin-right: 5px;
+}
