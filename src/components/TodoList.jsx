@@ -5,15 +5,20 @@ import {useSelector} from "react-redux";
 const TodoList = () => {
     const todos = useSelector(state => state.todos.todos)
 
+
     return (
         <div className="todo_list">
             {
-                todos.map((todo) => (
-                    <TodoItem
-                        key={todo.id}
-                        {...todo}
-                    />
-                ))
+                todos.length ? (
+                        todos.map((todo) => (
+                            <TodoItem
+                                key={todo.id}
+                                {...todo}
+                            />
+                        ))
+                ) : (
+                    <b>todo list is empty...</b>
+                )
             }
         </div>
     );
