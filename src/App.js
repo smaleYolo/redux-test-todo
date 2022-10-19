@@ -1,18 +1,27 @@
 import './App.css';
-import { useState } from "react";
+import {useEffect, useState} from "react";
+import {useDispatch, useSelector} from "react-redux";
+
 import InputField from "./components/InputField";
 import TodoList from "./components/TodoList";
-import {useDispatch} from "react-redux";
-import {addTodo} from "./store/todoSlice";
+
+import {addTodo, fetchTodos} from "./store/todoSlice";
 
 function App() {
-    const [text, setText] = useState('')
+    const [title, setTitle] = useState('')
     const dispatch = useDispatch()
+    const {status, error} = useSelector(state => state.todos)
 
-    const newTask = () => {
-        dispatch(addTodo({text}))
-        setText('')
+    const handleAction = () => {
+        if(title.trim().length){
+            dispatch(addTodo({title}))
+            setTitle('')
+        }
     }
+
+    useEffect(() => {
+        dispatch(fetchTodos())
+    },[dispatch])
 
     return (
         <div className="wrapper">
@@ -24,7 +33,11 @@ function App() {
                 </div>
             </div>
 
-            <InputField text={text} handleInput={setText} handleSubmit={newTask}/>
+            <InputField title={title} updateText={setTitle} handleAction={handleAction}/>
+
+            {status === 'loading' && <h2>Loading...</h2>}
+            {error && <h2>Some error happened: {error}</h2>}
+
 
             <TodoList/>
 
@@ -33,3 +46,4 @@ function App() {
 }
 
 export default App;
+//19.57
