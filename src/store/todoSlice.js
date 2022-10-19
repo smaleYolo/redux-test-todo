@@ -19,6 +19,89 @@ export const fetchTodos = createAsyncThunk(
     }
 )
 
+export const deleteTodo = createAsyncThunk(
+    'todos/deleteTodo',
+    async function(id , {rejectWithValue, dispatch}){
+        try{
+            const response = await fetch(`https://jsonplaceholder.typicode.com/todos/${id}`,{
+                method: 'DELETE',
+            })
+
+            if(!response.ok){
+                throw new Error('Cant delete task... Server Error!')
+            }
+
+            dispatch(removeTodo({id}))
+
+        } catch (error) {
+            return rejectWithValue(error.message)
+        }
+    }
+)
+
+export const toggleStatus = createAsyncThunk(
+    'todos/toggleStatus',
+    async function(id, {rejectWithValue, dispatch, getState}) {
+        const todo = getState().todos.todos.find(todo => todo.id === id)
+
+        try{
+            const response = await fetch(`https://jsonplaceholder.typicode.com/todos/${id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    completed: !todo.completed
+                })
+            })
+
+            if(!response.ok) {
+                throw new Error('Cant toggle Todo... Server Error!')
+            }
+
+            dispatch(toggleTodoComplete({id}))
+
+        } catch (error) {
+            return rejectWithValue(error.message)
+        }
+    }
+)
+
+export const addNewTodo = createAsyncThunk(
+    'todos/addNewTodo',
+    async function(title, {rejectWithValue, dispatch}){
+        try{
+            const response = await fetch('https://jsonplaceholder.typicode.com/todos', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: 1,
+                    title,
+                    completed: false,
+                }),
+            })
+
+            if(!response.ok){
+                throw new Error('Cant create new Task... Server Error!')
+            }
+
+            const data = await response.json();
+
+            dispatch(addTodo(data))
+
+        } catch (error) {
+            return rejectWithValue(error.message)
+        }
+    }
+)
+
+const setError = (state, action) => {
+    state.status = 'rejected';
+    state.error = action.payload;
+}
+
 const todoSlice = createSlice({
     name: 'todos',
     initialState: {
@@ -28,11 +111,7 @@ const todoSlice = createSlice({
     },
     reducers: {
         addTodo(state, action) {
-            state.todos.push({
-                id: state.todos.length,
-                title: action.payload.title,
-                completed: false
-            })
+            state.todos.push(action.payload)
         },
         removeTodo(state, action) {
             state.todos = state.todos.filter((todo) => todo.id !== action.payload.id)
@@ -51,13 +130,14 @@ const todoSlice = createSlice({
             state.status = 'resolved';
             state.todos = action.payload;
         },
-        [fetchTodos.rejected]: (state, action) => {
-            state.status = 'rejected';
-            state.error = action.payload;
-        },
+        [fetchTodos.rejected]: setError,
+        [deleteTodo.rejected]: setError,
+        [toggleStatus.rejected]: setError,
+        [addNewTodo.rejected]: setError,
     }
 })
 
-export const { addTodo, removeTodo, toggleTodoComplete } = todoSlice.actions;
+const { addTodo, removeTodo, toggleTodoComplete } = todoSlice.actions;
 
 export default todoSlice.reducer;
+

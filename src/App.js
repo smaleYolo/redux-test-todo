@@ -5,7 +5,7 @@ import {useDispatch, useSelector} from "react-redux";
 import InputField from "./components/InputField";
 import TodoList from "./components/TodoList";
 
-import {addTodo, fetchTodos} from "./store/todoSlice";
+import {addNewTodo, fetchTodos} from "./store/todoSlice";
 
 function App() {
     const [title, setTitle] = useState('')
@@ -14,7 +14,7 @@ function App() {
 
     const handleAction = () => {
         if(title.trim().length){
-            dispatch(addTodo({title}))
+            dispatch(addNewTodo(title))
             setTitle('')
         }
     }
@@ -46,4 +46,4 @@ function App() {
 }
 
 export default App;
-//19.57
+//22.13
